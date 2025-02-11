@@ -1,6 +1,11 @@
 {
-  "name": "CleanIt",
+  "name": "SimpleSignal",
   "tree": {
-    "$path": "CleanIt"
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "SimpleSignal": {
+        "$path": "SimpleSignal"
+      }
+    }
   }
 }

@@ -2,13 +2,15 @@ local mt = {}
 mt.__index = mt;
 --Connect
 function mt:Connect(func: () -> ())
-    table.insert(self,func)
+    self.Amount += 1;
+    self[self.Amount] = func;
 end
 --Destroy
 function mt:Destroy()
-    for i = #self,1,-1 do
+    for i = self.Amount,1,-1 do
         self[i] = nil;
     end
+    self.Amount = nil;
     table.clear(self)
     setmetatable(self,nil);
 end
@@ -21,6 +23,6 @@ function mt:Fire(...)
 end
 return {
     new = function()
-        return setmetatable({},mt)
+        return setmetatable({Amount = 0},mt)
     end
 }
