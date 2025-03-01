@@ -16,7 +16,7 @@ function mt:Destroy()
 end
 --Firing signal
 function mt:Fire(...)
-    for i = #self,1,-1 do
+    for i = self.Amount,1,-1 do
         local v = self[i]
         v(...);
     end

@@ -22,5 +22,7 @@ Signal:Destroy
 ### Roblox
 
 ### Wally
-
+```
+simplesignal = "prophetouw/simplesignal@1.0.0"
+```
 ### Github
