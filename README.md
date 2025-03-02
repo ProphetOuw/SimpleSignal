@@ -16,7 +16,7 @@ Signal:Fire("Message")
 ```
 ## Destroy
 ```lua
-Signal:Destroy
+Signal:Destroy()
 ```
 ## Installation
 ### Roblox
