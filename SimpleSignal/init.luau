@@ -1,28 +1,62 @@
 local mt = {}
 mt.__index = mt;
+local tins,tr,tf = table.insert,table.remove,table.find
+local disconnectmt = {};
+disconnectmt.__index = disconnectmt;
+function disconnectmt:Disconnect()
+    if self.signal ~= nil then
+        local f = tf(self.signal,self);
+        if f ~= nil then
+            tr(self.signal,f)
+        end
+        f = nil;
+    end
+    self.func = nil;
+    self.signal = nil;
+    setmetatable(self,nil);
+end
+disconnectmt.Destroy = disconnectmt.Disconnect
 --Connect
 function mt:Connect(func: () -> ())
-    self.Amount += 1;
-    self[self.Amount] = func;
+    if self.Destroying == true then return end;
+    local t = setmetatable({func = func,signal = self},disconnectmt)
+    tins(self,t)
+    return t;
 end
 --Destroy
 function mt:Destroy()
-    for i = self.Amount,1,-1 do
+    if self.Destroying then return end;
+    self.Destroying = true;
+    self:DisconnectAll();
+    setmetatable(self,nil);
+    self.Destroying = nil;
+end
+function mt:DisconnectAll()
+    for i = #self,1,-1 do
+        self[i]:Disconnect();
         self[i] = nil;
     end
-    self.Amount = nil;
-    table.clear(self)
-    setmetatable(self,nil);
 end
+ 
 --Firing signal
 function mt:Fire(...)
-    for i = self.Amount,1,-1 do
+    for i = #self,1,-1 do
         local v = self[i]
-        v(...);
+        v.func(...);
     end
 end
+export type Connection = {
+    Disconnect: (self: Connection) -> ();
+    Destroy: (self: Connection) -> ();
+}
+export type Signal = {
+    Fire: (self: Signal) -> (),
+    Connect: (self: Signal, func: () -> ()) -> Connection,
+    DisconnectAll: (self: Signal) -> (),
+    Destroy: (self: Signal) -> ()
+}
 return {
-    new = function()
-        return setmetatable({Amount = 0},mt)
+    new = function() : Signal
+        return setmetatable({},mt) :: any
     end
 }

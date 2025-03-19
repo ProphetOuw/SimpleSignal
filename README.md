@@ -6,9 +6,11 @@ local Signal = SignalLoader.new()
 ```
 ## Connect
 ```lua
-Signal:Connect(function(...)
+local Connection = Signal:Connect(function(...)
 
 end)
+task.wait(2)
+Connection:Disconnect();
 ```
 ## Fire
 ```lua
@@ -18,11 +20,16 @@ Signal:Fire("Message")
 ```lua
 Signal:Destroy()
 ```
+## DisconnectAll
+```lua
+Signal:DisconnectAll()
+```
+Removes all current connections
 ## Installation
 ### Roblox
 
 ### Wally
 ```
-simplesignal = "prophetouw/simplesignal@1.0.0"
+simplesignal = "prophetouw/simplesignal@1.0.4"
 ```
 ### Github
