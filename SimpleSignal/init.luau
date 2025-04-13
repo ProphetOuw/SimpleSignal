@@ -39,6 +39,7 @@ function mt:Destroy()
 end
 function mt:DisconnectAll()
     for i = #self,1,-1 do
+        if self[i] == nil then continue end;
         self[i]:Disconnect();
         self[i] = nil;
     end
@@ -47,22 +48,37 @@ end
 --Firing signal
 function mt:Fire(...)
     for i = #self,1,-1 do
-        task.spawn(self[i].func,...)
-        if self[i].Once == true then
-            self[i]:Disconnect();
+        local v = self[i];
+        if v == nil then continue end;
+        task.spawn(v.func,...)
+        if v.Once == true then
+            v:Disconnect();
         end
     end
 end
+
+-- Wait functionality
+function mt:Wait()
+    local thread = coroutine.running()
+    local connection
+    connection = self:Connect(function(...)
+        connection:Disconnect()
+        coroutine.resume(thread, ...)
+    end)
+    return coroutine.yield()
+end
+
 export type Connection = {
     Disconnect: (self: Connection) -> ();
     Destroy: (self: Connection) -> ();
 }
 export type Signal = {
-    Fire: (self: Signal) -> (),
+    Fire: (self: Signal, ...any) -> (),
     Connect: (self: Signal, func: () -> ()) -> Connection,
     Once: (self: Signal, func: () -> ()) -> Connection,
     DisconnectAll: (self: Signal) -> (),
-    Destroy: (self: Signal) -> ()
+    Destroy: (self: Signal) -> (),
+    Wait: (self: Signal) -> any
 }
 return {
     new = function() : Signal
