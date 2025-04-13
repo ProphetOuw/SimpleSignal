@@ -57,14 +57,33 @@ function mt:Fire(...)
     end
 end
 
--- Wait functionality
-function mt:Wait()
+function mt:Wait(timeout)
     local thread = coroutine.running()
+    local isFired = false
     local connection
+    local timeoutTask = nil  -- Variable to hold the reference to the timeout task
+
     connection = self:Connect(function(...)
-        connection:Disconnect()
-        coroutine.resume(thread, ...)
+        if not isFired then
+            isFired = true
+            connection:Disconnect()
+            if timeoutTask then
+                timeoutTask:Cancel()  -- Cancel the timeout task if it's still pending
+            end
+            coroutine.resume(thread, ...)
+        end
     end)
+
+    if timeout then
+        timeoutTask = task.delay(timeout, function()
+            if not isFired then
+                isFired = true
+                connection:Disconnect()
+                coroutine.resume(thread, nil) -- Resume with nil to indicate a timeout
+            end
+        end)
+    end
+
     return coroutine.yield()
 end
 
