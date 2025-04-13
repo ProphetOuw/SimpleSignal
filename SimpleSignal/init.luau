@@ -57,7 +57,7 @@ function mt:Fire(...)
     end
 end
 
-function mt:Wait(timeout)
+function mt:Wait(timeout: number)
     local thread = coroutine.running()
     local isFired = false
     local connection
@@ -68,7 +68,8 @@ function mt:Wait(timeout)
             isFired = true
             connection:Disconnect()
             if timeoutTask then
-                timeoutTask:Cancel()  -- Cancel the timeout task if it's still pending
+                task.cancel(timeoutTask)
+                timeoutTask = nil;
             end
             coroutine.resume(thread, ...)
         end
@@ -97,7 +98,7 @@ export type Signal = {
     Once: (self: Signal, func: () -> ()) -> Connection,
     DisconnectAll: (self: Signal) -> (),
     Destroy: (self: Signal) -> (),
-    Wait: (self: Signal) -> any
+    Wait: (self: Signal, timeout: number) -> any
 }
 return {
     new = function() : Signal
